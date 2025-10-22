@@ -229,6 +229,127 @@
         opacity: 0.4;
         cursor: not-allowed;
       }
+
+      /* ====== ADDED: Modal styles (full-screen, bubble animation, accessibility) ====== */
+      /* Keep modal out of flow and initially hidden */
+      #prayerModal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        z-index: 9999;
+        /* white background as requested */
+        background: white;
+        -webkit-overflow-scrolling: touch;
+        overflow: auto;
+      }
+
+      /* When body has modal-open, show modal */
+      body.modal-open > #prayerModal {
+        display: block;
+      }
+
+      /* Hide everything behind modal visually & prevent interaction */
+      body.modal-open > *:not(#prayerModal) {
+        visibility: hidden;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .prayer-modal-inner {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        position: relative;
+      }
+
+      .prayer-modal-content {
+        max-width: 900px;
+        width: 100%;
+        max-height: 92vh;
+        overflow: auto;
+        border-radius: 14px;
+        padding: 2.25rem;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(2, 6, 23, 0.15);
+      }
+
+      /* Close icon position */
+      .prayer-modal-close {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 8px;
+      }
+
+      .prayer-modal-close:focus {
+        outline: 2px solid rgba(30, 64, 175, 0.25);
+      }
+
+      /* Bubble background animation container */
+      .prayer-modal-bubbles {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .bubble {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(229, 231, 235, 0.7),
+          rgba(241, 245, 249, 0.6)
+        );
+        mix-blend-mode: screen;
+        animation: bubbleMove 12s linear infinite;
+      }
+
+      @keyframes bubbleMove {
+        0% {
+          transform: translateY(40vh) scale(0.8);
+          opacity: 0.6;
+        }
+        50% {
+          transform: translateY(-20vh) scale(1.1);
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(-80vh) scale(1);
+          opacity: 0;
+        }
+      }
+
+      /* Reduce motion fallback */
+      @media (prefers-reduced-motion: reduce) {
+        .particle,
+        .bubble,
+        .hero-overlay {
+          animation: none !important;
+        }
+      }
+
+      /* Ensure modal content appears above bubbles */
+      .prayer-modal-content-inner {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Small responsive tweaks */
+      @media (max-width: 640px) {
+        .prayer-modal-content {
+          padding: 1rem;
+          border-radius: 8px;
+        }
+      }
+      /* ====== END ADDED ====== */
     </style>
   </head>
   <body
@@ -838,7 +959,7 @@
                 >
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path
-                      d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"
+                      d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.360 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"
                     />
                   </svg>
                 </a>
@@ -973,6 +1094,58 @@
       </div>
     </template>
 
+    <!-- ====== ADDED: Modal markup (placed near end of body) ====== -->
+    <div
+      id="prayerModal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="prayerModalTitle"
+    >
+      <div class="prayer-modal-inner">
+        <!-- bubble animated background -->
+        <div class="prayer-modal-bubbles" aria-hidden="true">
+          <!-- bubbles will be generated by JS -->
+        </div>
+
+        <div class="prayer-modal-content" role="document">
+          <button
+            class="prayer-modal-close"
+            aria-label="Close prayer modal"
+            id="prayerModalCloseBtn"
+          >
+            <svg
+              class="h-6 w-6 text-slate-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <div class="prayer-modal-content-inner" id="prayerModalContentInner">
+            <h2
+              id="prayerModalTitle"
+              class="text-2xl font-bold text-slate-800 mb-4"
+            >
+              Prayer Details
+            </h2>
+            <div
+              id="prayerModalBody"
+              class="text-slate-700 leading-relaxed"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ====== END ADDED ====== -->
+
     <script>
       // ===== CONFIGURATION =====
       // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
@@ -1002,6 +1175,15 @@
       const currentPageEl = document.getElementById("currentPage");
       const totalPagesEl = document.getElementById("totalPages");
       const prayerCountEl = document.getElementById("prayerCount");
+      // ===== ADDED: modal related elements =====
+      const prayerModal = document.getElementById("prayerModal"); // ADDED
+      const prayerModalCloseBtn = document.getElementById(
+        "prayerModalCloseBtn"
+      ); // ADDED
+      const prayerModalBody = document.getElementById("prayerModalBody"); // ADDED
+      const prayerModalBubbles = document.querySelector(
+        ".prayer-modal-bubbles"
+      ); // ADDED
 
       yearEl.textContent = new Date().getFullYear();
 
@@ -1126,6 +1308,7 @@
           const card = document.createElement("article");
           card.className =
             "p-6 rounded-2xl bg-white/80 backdrop-blur-xl shadow-lg hover-lift border border-white/50";
+          // ===== ADDED: include View Prayers button (and attach event later) =====
           card.innerHTML = `
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rgc-blue to-purple-600 flex items-center justify-center text-white font-bold">
@@ -1149,8 +1332,23 @@
               ? `<div class="mt-3 text-xs text-slate-400">Added: ${prayer.date}</div>`
               : ""
           }
+          <div class="mt-5 flex items-center justify-end">
+            <button class="view-prayer-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-rgc-blue to-purple-600 text-white font-semibold focus:outline-none" data-idx="${
+              globalIdx - 1
+            }">
+              View Prayers
+            </button>
+          </div>
         `;
           publicPrayers.appendChild(card);
+
+          // Attach event listener to the newly created button (ADDED)
+          const viewBtn = card.querySelector(".view-prayer-btn");
+          if (viewBtn) {
+            viewBtn.addEventListener("click", () =>
+              openPrayerModal(prayer, globalIdx)
+            );
+          }
         });
       }
 
@@ -1312,6 +1510,7 @@
       (function init() {
         addPrayerBlock();
         loadPrayers();
+        initModal(); // ADDED: initialize modal helpers
       })();
 
       // ===== EVENT LISTENERS =====
@@ -1360,6 +1559,143 @@
         el.style.transition = "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
         observer.observe(el);
       });
+
+      // ====== ADDED: Modal Implementation ======
+      let lastFocusedElementBeforeModal = null;
+      let modalOpen = false;
+
+      function initModal() {
+        // generate some bubbles for the background animation
+        generateBubbles(8);
+
+        // close handlers
+        prayerModalCloseBtn.addEventListener("click", closePrayerModal);
+        // close on overlay click (only if clicked outside content)
+        prayerModal.addEventListener("click", (e) => {
+          if (e.target === prayerModal) closePrayerModal();
+        });
+
+        // ESC key closes modal
+        document.addEventListener("keydown", (e) => {
+          if (!modalOpen) return;
+          if (e.key === "Escape") {
+            e.preventDefault();
+            closePrayerModal();
+          } else if (e.key === "Tab") {
+            // trap focus inside modal
+            trapModalTab(e);
+          }
+        });
+      }
+
+      function generateBubbles(count = 6) {
+        prayerModalBubbles.innerHTML = ""; // clear
+        for (let i = 0; i < count; i++) {
+          const b = document.createElement("div");
+          b.className = "bubble";
+          const size = 60 + Math.round(Math.random() * 160);
+          b.style.width = `${size}px`;
+          b.style.height = `${size}px`;
+          b.style.left = `${Math.round(Math.random() * 100)}%`;
+          b.style.bottom = `${-Math.round(Math.random() * 40)}%`;
+          b.style.opacity = 0.2 + Math.random() * 0.6;
+          b.style.animationDelay = `${Math.random() * 6}s`;
+          b.style.transform = `translateY(0) scale(${0.8 + Math.random()})`;
+          prayerModalBubbles.appendChild(b);
+        }
+      }
+
+      function openPrayerModal(prayer, index) {
+        if (modalOpen) return; // prevent multiple opens
+
+        lastFocusedElementBeforeModal = document.activeElement;
+        modalOpen = true;
+
+        // Populate modal content
+        const titleEl = document.getElementById("prayerModalTitle");
+        titleEl.textContent = `Prayer Request ${index}`;
+
+        prayerModalBody.innerHTML = `
+          <div class="mb-4 text-slate-700">${escapeHtml(prayer.points).replace(
+            /\n/g,
+            "<br>"
+          )}</div>
+          <div class="text-sm text-slate-500">Scripture: <span class="text-slate-600 font-medium">${escapeHtml(
+            prayer.scripture
+          )}</span></div>
+          ${
+            prayer.date
+              ? `<div class="mt-3 text-xs text-slate-400">Added: ${prayer.date}</div>`
+              : ""
+          }
+        `;
+
+        // Show modal by toggling class on body so everything behind becomes hidden and non-interactive
+        document.body.classList.add("modal-open");
+        prayerModal.setAttribute("aria-hidden", "false");
+        // prevent body scroll
+        document.body.style.overflow = "hidden";
+
+        // generate fresh bubbles (for responsiveness / visual interest)
+        generateBubbles(8);
+
+        // focus first focusable element in modal (close button)
+        setTimeout(() => {
+          prayerModalCloseBtn.focus();
+        }, 50);
+      }
+
+      function closePrayerModal() {
+        if (!modalOpen) return;
+        modalOpen = false;
+
+        prayerModal.setAttribute("aria-hidden", "true");
+        // remove class to restore visibility & pointer-events for page content
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+
+        // restore focus
+        if (
+          lastFocusedElementBeforeModal &&
+          lastFocusedElementBeforeModal.focus
+        ) {
+          lastFocusedElementBeforeModal.focus();
+        }
+      }
+
+      function trapModalTab(e) {
+        const focusable = prayerModal.querySelectorAll(
+          'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], [contenteditable]'
+        );
+        if (!focusable.length) {
+          e.preventDefault();
+          return;
+        }
+        const focusableArr = Array.prototype.slice
+          .call(focusable)
+          .filter(function (el) {
+            return (
+              el.offsetWidth || el.offsetHeight || el.getClientRects().length
+            );
+          });
+        const first = focusableArr[0];
+        const last = focusableArr[focusableArr.length - 1];
+
+        if (e.shiftKey) {
+          // shift + tab
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          // tab
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+      // ====== END ADDED ======
     </script>
   </body>
 </html>
