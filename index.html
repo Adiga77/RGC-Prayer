@@ -1635,12 +1635,14 @@
         titleEl.textContent = `Prayer Request ${index}`;
 
         prayerModalBody.innerHTML = `
-          <div class="mb-4 text-3xl text-white">${escapeHtml(
-            prayer.points
-          ).replace(/\n/g, "<br>")}</div>
-          <div class="text-2xl bg-amber-500 p-7 text-white text-center">Scripture: <span class="text-white font-medium">${escapeHtml(
-            prayer.scripture
-          )}</span></div>
+          <div class="mb-4 text-3xl text-white">
+            ${escapeHtml(prayer.points.toUpperCase()).replace(/\n/g, "<br>")}
+          </div>
+          <div class="text-2xl bg-amber-500 p-7 text-white text-center">
+            SCRIPTURE: <span class="text-white font-medium">
+              ${escapeHtml(prayer.scripture.toUpperCase())}
+            </span>
+          </div>
         `;
 
         // Show modal by toggling class on body so everything behind becomes hidden and non-interactive
